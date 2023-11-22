@@ -1,50 +1,50 @@
-from random import randint
+from random import choice
 
-lives = 5 # Feel free to change to make it easier or harder
-lengthOfMinimumWord = 5 # Feel free to change to make the word length requirement higher / lower
+lives = 5  # Number of lives
+lengthOfMinimumWord = 5  # Minimum word length
 
+# Read words from file and filter based on minimum word length
 with open('words.txt', 'r') as f:
-  fileContent = f.read()
-words = fileContent.split()
+    words = [word.strip() for word in f if len(word.strip()) > lengthOfMinimumWord]
 
-while True:
-  wordChoiceNum = randint(0, len(words) - 1)
-  if len(words[wordChoiceNum]) > lengthOfMinimumWord:
-    wordChoice = words[wordChoiceNum] 
-    break
+wordChoice = choice(words)  # Choose a random word from the list
+guessedWord = ["_"] * len(wordChoice)  # Initialize guessed word with underscores
+previousGuesses = set()  # Set to store previous guesses
 
-for i in range(len(wordChoice)):
-  print("_", end = " ")
+print(" ".join(guessedWord))
 print(f"Word Length: {len(wordChoice)}")
 
-guessedWord = ["_"] * len(wordChoice)
-previousGuesses = []
-
 while True:
+    guess = input("Guess a letter: ")
 
-  guess = input("Guess a letter: ")
-  if not (isinstance(guess, str) and guess.isalpha() and len(guess) == 1):
-    print("Must be a letter")
-  else:
-    if guess in previousGuesses:
-      print(f"You have already guessed {guess}")
+    if len(guess) != 1 or not guess.isalpha():
+        print("Must be a letter")
     else:
-      previousGuesses += guess
-      correctGuess = False 
+        if guess in previousGuesses:
+            print(f"You have already guessed {guess}")
+        else:
+            previousGuesses.add(guess)
+            correctGuess = False
 
-      for index in range(len(wordChoice)):
-        if guess == wordChoice[index]:
-          guessedWord[index] = guess
-          correctGuess = True
-      print(" ".join(guessedWord)) 
+            # Check if the guess is correct
+            for index, letter in enumerate(wordChoice):
+                if guess == letter:
+                    guessedWord[index] = guess
+                    correctGuess = True
 
-      if "_" not in guessedWord:
-        print(f"Congratulations! You guessed the word. The word was {wordChoice}")
-        break
+            print(" ".join(guessedWord))
 
-      if not correctGuess:
-        lives -= 1
-        if lives == 0:
-          print(f"Game over, you ran out of lives. The word was {wordChoice}")
-          break
-        print(f"The letter '{guess}' is not in the word. Lives left: {lives}")
+            # Check if the word has been completely guessed
+            if "_" not in guessedWord:
+                print(f"Congratulations! You guessed the word. The word was {wordChoice}")
+                break
+
+            # Check if the guess is incorrect
+            if not correctGuess:
+                lives -= 1
+
+                if lives == 0:
+                    print(f"Game over, you ran out of lives. The word was {wordChoice}")
+                    break
+
+                print(f"The letter '{guess}' is not in the word. Lives left: {lives}")
